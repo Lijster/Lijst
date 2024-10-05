@@ -50,6 +50,15 @@
             justify-content: center;
             cursor: pointer;
         }
+        #reset-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
     </style>
     <script>
         let currentPlayer = 'X';
@@ -58,6 +67,11 @@
                 cell.innerText = currentPlayer;
                 currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
             }
+        }
+        function resetGame() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => cell.innerText = '');
+            currentPlayer = 'X';
         }
     </script>
 </head>
@@ -79,6 +93,7 @@
             <div class="cell" onclick="handleCellClick(this)"></div>
             <div class="cell" onclick="handleCellClick(this)"></div>
         </div>
+        <button id="reset-button" onclick="resetGame()">Reset Spel</button>
     </main>
     <footer>
         <p>&copy; 2024 Mijn Vernieuwde Website</p>
