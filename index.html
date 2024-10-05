@@ -31,7 +31,35 @@
             height: auto;
             margin-top: 1em;
         }
+        .tic-tac-toe {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            justify-content: center;
+            margin-top: 2em;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            border: 2px solid #ff9800;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
     </style>
+    <script>
+        let currentPlayer = 'X';
+        function handleCellClick(cell) {
+            if (cell.innerText === '') {
+                cell.innerText = currentPlayer;
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            }
+        }
+    </script>
 </head>
 <body>
     <header>
@@ -39,7 +67,18 @@
     </header>
     <main>
         <p>Dit is een vernieuwde versie van mijn website met aangepaste kleuren en lay-out. Je kunt deze tekst aanpassen om meer over jezelf te vertellen of extra informatie toe te voegen.</p>
-        <img src="nieuwefoto.jpg" alt="Nieuwe foto van mij">
+        <img src="mijnfoto.jpg" alt="Foto van mij">
+        <div class="tic-tac-toe">
+            <div class="cell" onclick="handleCellClick(this)"></div>
+            <div class="cell" onclick="handleCellClick(this)"></div>
+            <div class="cell" onclick="handleCellClick(this)"></div>
+            <div class="cell" onclick="handleCellClick(this)"></div>
+            <div class="cell" onclick="handleCellClick(this)"></div>
+            <div class="cell" onclick="handleCellClick(this)"></div>
+            <div class="cell" onclick="handleCellClick(this)"></div>
+            <div class="cell" onclick="handleCellClick(this)"></div>
+            <div class="cell" onclick="handleCellClick(this)"></div>
+        </div>
     </main>
     <footer>
         <p>&copy; 2024 Mijn Vernieuwde Website</p>
