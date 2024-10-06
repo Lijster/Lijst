@@ -4,8 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nieuwe Simpele Website</title>
-    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js"></script>
+    <script type="module">
+        // Firebase importeren
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-analytics.js";
+
+        // Firebase configuratie toevoegen
+        const firebaseConfig = {
+            apiKey: "AIzaSyDasW2Ij2kgryFnEE2Kw8PqihF-oM2yT14",
+            authDomain: "lijst-8ec88.firebaseapp.com",
+            databaseURL: "https://lijst-8ec88-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "lijst-8ec88",
+            storageBucket: "lijst-8ec88.appspot.com",
+            messagingSenderId: "757775028115",
+            appId: "1:757775028115:web:420c9e7eb32f5bd37ba266",
+            measurementId: "G-CCY0G5MQJW"
+        };
+
+        // Firebase initialiseren
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const analytics = getAnalytics(app);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMessages();
+        });
+
+        let currentPlayer = 'X';
+        let board = ['', '', '', '', '', '', '', '', ''];
+
+        function handleCellClick(cell, index) {
+            if (cell.innerText === '' && !checkWinner()) {
+                cell.innerText = currentPlayer;
+                cell.classList.add(currentPlayer.toLowerCase());
+                board[index] = currentPlayer;
+                if (checkWinner()) {
+                    setTimeout(() => alert(currentPlayer + ' heeft gewonnen!'), 100);
+                } else {
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                }
+            }
+        }
+
+        function resetGame() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                cell.innerText = '';
+                cell.classList.remove('x', 'o');
+            });
+            board = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+        }
+
+        function checkWinner() {
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            for (let combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function addMessage() {
+            const messageInput = document.getElementById('message-input');
+            const date = new Date();
+            const dateTimeString = date.toLocaleString();
+
+            if (messageInput.value.trim() !== '') {
+                const newMessage = {
+                    text: messageInput.value,
+                    timestamp: dateTimeString
+                };
+                // Bericht naar Firebase opslaan
+                const messagesRef = ref(database, 'messages');
+                push(messagesRef, newMessage);
+                messageInput.value = '';
+            }
+        }
+
+        function loadMessages() {
+            const messageList = document.getElementById('message-list');
+            const messagesRef = ref(database, 'messages');
+            onValue(messagesRef, (snapshot) => {
+                messageList.innerHTML = '';
+                snapshot.forEach((childSnapshot) => {
+                    const message = childSnapshot.val();
+                    const listItem = document.createElement('li');
+                    listItem.innerText = `${message.timestamp} - ${message.text}`;
+                    messageList.appendChild(listItem);
+                });
+            });
+        }
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -83,97 +180,6 @@
             border-radius: 5px;
         }
     </style>
-    <script>
-        // Firebase configuratie toevoegen
-        const firebaseConfig = {
-            apiKey: "AIzaSyDasW2Ij2kgryFnEE2Kw8PqihF-oM2yT14",
-            authDomain: "lijst-8ec88.firebaseapp.com",
-            databaseURL: "https://lijst-8ec88-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "lijst-8ec88",
-            storageBucket: "lijst-8ec88.appspot.com",
-            messagingSenderId: "757775028115",
-            appId: "1:757775028115:web:420c9e7eb32f5bd37ba266",
-            measurementId: "G-CCY0G5MQJW"
-        };
-
-        // Firebase initialiseren
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadMessages();
-        });
-
-        let currentPlayer = 'X';
-        let board = ['', '', '', '', '', '', '', '', ''];
-
-        function handleCellClick(cell, index) {
-            if (cell.innerText === '' && !checkWinner()) {
-                cell.innerText = currentPlayer;
-                cell.classList.add(currentPlayer.toLowerCase());
-                board[index] = currentPlayer;
-                if (checkWinner()) {
-                    setTimeout(() => alert(currentPlayer + ' heeft gewonnen!'), 100);
-                } else {
-                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                }
-            }
-        }
-
-        function resetGame() {
-            const cells = document.querySelectorAll('.cell');
-            cells.forEach(cell => {
-                cell.innerText = '';
-                cell.classList.remove('x', 'o');
-            });
-            board = ['', '', '', '', '', '', '', '', ''];
-            currentPlayer = 'X';
-        }
-
-        function checkWinner() {
-            const winningCombinations = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8],
-                [0, 3, 6], [1, 4, 7], [2, 5, 8],
-                [0, 4, 8], [2, 4, 6]
-            ];
-            for (let combination of winningCombinations) {
-                const [a, b, c] = combination;
-                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        function addMessage() {
-            const messageInput = document.getElementById('message-input');
-            const date = new Date();
-            const dateTimeString = date.toLocaleString();
-
-            if (messageInput.value.trim() !== '') {
-                const newMessage = {
-                    text: messageInput.value,
-                    timestamp: dateTimeString
-                };
-                // Bericht naar Firebase opslaan
-                firebase.database().ref('messages').push(newMessage);
-                messageInput.value = '';
-            }
-        }
-
-        function loadMessages() {
-            const messageList = document.getElementById('message-list');
-            firebase.database().ref('messages').on('value', (snapshot) => {
-                messageList.innerHTML = '';
-                snapshot.forEach((childSnapshot) => {
-                    const message = childSnapshot.val();
-                    const listItem = document.createElement('li');
-                    listItem.innerText = `${message.timestamp} - ${message.text}`;
-                    messageList.appendChild(listItem);
-                });
-            });
-        }
-    </script>
 </head>
 <body>
     <header>
