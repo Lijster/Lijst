@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nieuwe Simpele Website</title>
+    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -48,6 +50,12 @@
             justify-content: center;
             cursor: pointer;
         }
+        .cell.x {
+            color: #ff5722;
+        }
+        .cell.o {
+            color: #2196f3;
+        }
         #reset-button {
             margin-top: 20px;
             padding: 10px 20px;
@@ -57,19 +65,113 @@
             border: none;
             cursor: pointer;
         }
+        #message-board {
+            margin-top: 2em;
+            text-align: left;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #message-board ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #message-board li {
+            background-color: #f1f1f1;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
     </style>
     <script>
+        // Firebase configuratie toevoegen
+        const firebaseConfig = {
+            apiKey: "AIzaSyDasW2Ij2kgryFnEE2Kw8PqihF-oM2yT14",
+            authDomain: "lijst-8ec88.firebaseapp.com",
+            databaseURL: "https://lijst-8ec88-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "lijst-8ec88",
+            storageBucket: "lijst-8ec88.appspot.com",
+            messagingSenderId: "757775028115",
+            appId: "1:757775028115:web:420c9e7eb32f5bd37ba266",
+            measurementId: "G-CCY0G5MQJW"
+        };
+
+        // Firebase initialiseren
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMessages();
+        });
+
         let currentPlayer = 'X';
-        function handleCellClick(cell) {
-            if (cell.innerText === '') {
+        let board = ['', '', '', '', '', '', '', '', ''];
+
+        function handleCellClick(cell, index) {
+            if (cell.innerText === '' && !checkWinner()) {
                 cell.innerText = currentPlayer;
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                cell.classList.add(currentPlayer.toLowerCase());
+                board[index] = currentPlayer;
+                if (checkWinner()) {
+                    setTimeout(() => alert(currentPlayer + ' heeft gewonnen!'), 100);
+                } else {
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                }
             }
         }
+
         function resetGame() {
             const cells = document.querySelectorAll('.cell');
-            cells.forEach(cell => cell.innerText = '');
+            cells.forEach(cell => {
+                cell.innerText = '';
+                cell.classList.remove('x', 'o');
+            });
+            board = ['', '', '', '', '', '', '', '', ''];
             currentPlayer = 'X';
+        }
+
+        function checkWinner() {
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            for (let combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function addMessage() {
+            const messageInput = document.getElementById('message-input');
+            const date = new Date();
+            const dateTimeString = date.toLocaleString();
+
+            if (messageInput.value.trim() !== '') {
+                const newMessage = {
+                    text: messageInput.value,
+                    timestamp: dateTimeString
+                };
+                // Bericht naar Firebase opslaan
+                firebase.database().ref('messages').push(newMessage);
+                messageInput.value = '';
+            }
+        }
+
+        function loadMessages() {
+            const messageList = document.getElementById('message-list');
+            firebase.database().ref('messages').on('value', (snapshot) => {
+                messageList.innerHTML = '';
+                snapshot.forEach((childSnapshot) => {
+                    const message = childSnapshot.val();
+                    const listItem = document.createElement('li');
+                    listItem.innerText = `${message.timestamp} - ${message.text}`;
+                    messageList.appendChild(listItem);
+                });
+            });
         }
     </script>
 </head>
@@ -81,23 +183,28 @@
         <p>Dit is een vernieuwde versie van mijn website met aangepaste kleuren en lay-out. Je kunt deze tekst aanpassen om meer over jezelf te vertellen of extra informatie toe te voegen.</p>
         <img src="mijnfoto.jpg" alt="Foto van mij">
         <div class="tic-tac-toe">
-            <div class="cell" onclick="handleCellClick(this)"></div>
-            <div class="cell" onclick="handleCellClick(this)"></div>
-            <div class="cell" onclick="handleCellClick(this)"></div>
-            <div class="cell" onclick="handleCellClick(this)"></div>
-            <div class="cell" onclick="handleCellClick(this)"></div>
-            <div class="cell" onclick="handleCellClick(this)"></div>
-            <div class="cell" onclick="handleCellClick(this)"></div>
-            <div class="cell" onclick="handleCellClick(this)"></div>
-            <div class="cell" onclick="handleCellClick(this)"></div>
+            <div class="cell" onclick="handleCellClick(this, 0)"></div>
+            <div class="cell" onclick="handleCellClick(this, 1)"></div>
+            <div class="cell" onclick="handleCellClick(this, 2)"></div>
+            <div class="cell" onclick="handleCellClick(this, 3)"></div>
+            <div class="cell" onclick="handleCellClick(this, 4)"></div>
+            <div class="cell" onclick="handleCellClick(this, 5)"></div>
+            <div class="cell" onclick="handleCellClick(this, 6)"></div>
+            <div class="cell" onclick="handleCellClick(this, 7)"></div>
+            <div class="cell" onclick="handleCellClick(this, 8)"></div>
         </div>
+        <button id="reset-button" onclick="resetGame()">Reset Spel</button>
+        <a href="https://www.rolbox.com" target="_blank">Bezoek Rolbox</a>
         
-    <button id="reset-button" onclick="resetGame()">Reset Spel</button>
-    <a href="https://www.rolbox.com" target="_blank">Bezoek Rolbox</a>
+        <div id="message-board">
+            <h2>Laat een bericht achter:</h2>
+            <input type="text" id="message-input" placeholder="Typ hier je bericht...">
+            <button onclick="addMessage()">Verstuur</button>
+            <ul id="message-list"></ul>
+        </div>
     </main>
     <footer>
         <p>&copy; 2024 Mijn Vernieuwde Website</p>
     </footer>
-    <button id="reset-button" onclick="resetGame()">Reset Spel</button>
 </body>
 </html>
