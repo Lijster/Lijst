@@ -1,89 +1,243 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nieuwe Simpele Website</title>
+    <script type="module">
+        // Firebase importeren
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-analytics.js";
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/10.14.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/10.14.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/10.14.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/10.14.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/10.14.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/10.14.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/10.14.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/10.14.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/10.14.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/10.14.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+        // Firebase configuratie toevoegen
+        const firebaseConfig = {
+            apiKey: "AIzaSyDasW2Ij2kgryFnEE2Kw8PqihF-oM2yT14",
+            authDomain: "lijst-8ec88.firebaseapp.com",
+            databaseURL: "https://lijst-8ec88-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "lijst-8ec88",
+            storageBucket: "lijst-8ec88.appspot.com",
+            messagingSenderId: "757775028115",
+            appId: "1:757775028115:web:420c9e7eb32f5bd37ba266",
+            measurementId: "G-CCY0G5MQJW"
+        };
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
-    </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+        // Firebase initialiseren
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const analytics = getAnalytics(app);
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("Document geladen. Laden van berichten...");
+            loadMessages();
+        });
 
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+        let currentPlayer = 'X';
+        let board = ['', '', '', '', '', '', '', '', ''];
+
+        function handleCellClick(cell, index) {
+            console.log("Cel aangeklikt: Index", index);
+            if (cell.innerText === '' && !checkWinner()) {
+                cell.innerText = currentPlayer;
+                cell.classList.add(currentPlayer.toLowerCase());
+                board[index] = currentPlayer;
+                console.log("Speler", currentPlayer, "heeft een zet gedaan.");
+                if (checkWinner()) {
+                    setTimeout(() => alert(currentPlayer + ' heeft gewonnen!'), 100);
+                } else {
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                    console.log("Volgende speler is", currentPlayer);
+                }
+            }
         }
-      });
+
+        function resetGame() {
+            console.log("Spel resetten...");
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                cell.innerText = '';
+                cell.classList.remove('x', 'o');
+            });
+            board = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+        }
+
+        function checkWinner() {
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            for (let combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    console.log("Winnaar gevonden: Speler", board[a]);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        async function addMessage() {
+            const messageInput = document.getElementById('message-input');
+            const date = new Date();
+            const dateTimeString = date.toLocaleString();
+
+            if (messageInput.value.trim() !== '') {
+                const newMessage = {
+                    text: messageInput.value,
+                    timestamp: dateTimeString
+                };
+                console.log("Proberen bericht toe te voegen:", newMessage);
+                try {
+                    // Bericht naar Firebase opslaan
+                    const messagesRef = ref(database, 'messages');
+                    await push(messagesRef, newMessage);
+                    console.log("Bericht succesvol toegevoegd");
+                    messageInput.value = '';
+                } catch (error) {
+                    console.error('Fout bij het opslaan van bericht:', error);
+                }
+            } else {
+                console.log("Berichtveld is leeg");
+            }
+        }
+
+        function loadMessages() {
+            const messageList = document.getElementById('message-list');
+            if (!messageList) {
+                console.error("Element met ID 'message-list' niet gevonden in de HTML.");
+                return;
+            }
+            const messagesRef = ref(database, 'messages');
+            console.log("Laden van berichten uit de database...");
+            onValue(messagesRef, (snapshot) => {
+                messageList.innerHTML = '';
+                snapshot.forEach((childSnapshot) => {
+                    const message = childSnapshot.val();
+                    console.log("Ontvangen bericht:", message);
+                    const listItem = document.createElement('li');
+                    listItem.innerText = `${message.timestamp} - ${message.text}`;
+                    messageList.appendChild(listItem);
+                });
+            }, (error) => {
+                console.error("Fout bij laden van berichten:", error);
+            });
+        }
+
+        // Functies beschikbaar maken in de globale scope
+        window.addMessage = addMessage;
+        window.handleCellClick = handleCellClick;
+        window.resetGame = resetGame;
     </script>
-  </body>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #ffffff;
+        }
+        header {
+            background-color: #ff9800;
+            color: white;
+            padding: 1em;
+        }
+        main {
+            margin: 2em;
+        }
+        footer {
+            background-color: #2196f3;
+            color: white;
+            padding: 1em;
+            width: 100%;
+        }
+        img {
+            max-width: 400px;
+            height: auto;
+            margin-top: 1em;
+        }
+        .tic-tac-toe {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            justify-content: center;
+            margin-top: 2em;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            border: 2px solid #ff9800;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .cell.x {
+            color: #ff5722;
+        }
+        .cell.o {
+            color: #2196f3;
+        }
+        #reset-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #message-board {
+            margin-top: 2em;
+            text-align: left;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #message-board ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #message-board li {
+            background-color: #f1f1f1;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welkom op Lijst zijn website</h1>
+    </header>
+    <main>
+        <p>Dit is een vernieuwde versie van mijn website met aangepaste kleuren en lay-out. Je kunt deze tekst aanpassen om meer over jezelf te vertellen of extra informatie toe te voegen.</p>
+        <img src="mijnfoto.jpg" alt="Foto van mij">
+        <div class="tic-tac-toe">
+            <div class="cell" onclick="handleCellClick(this, 0)"></div>
+            <div class="cell" onclick="handleCellClick(this, 1)"></div>
+            <div class="cell" onclick="handleCellClick(this, 2)"></div>
+            <div class="cell" onclick="handleCellClick(this, 3)"></div>
+            <div class="cell" onclick="handleCellClick(this, 4)"></div>
+            <div class="cell" onclick="handleCellClick(this, 5)"></div>
+            <div class="cell" onclick="handleCellClick(this, 6)"></div>
+            <div class="cell" onclick="handleCellClick(this, 7)"></div>
+            <div class="cell" onclick="handleCellClick(this, 8)"></div>
+        </div>
+        <button id="reset-button" onclick="resetGame()">Reset Spel</button>
+        <a href="https://www.rolbox.com" target="_blank">Bezoek Rolbox</a>
+        
+        <div id="message-board">
+            <h2>Laat een bericht achter:</h2>
+            <input type="text" id="message-input" placeholder="Typ hier je bericht...">
+            <button onclick="addMessage()">Verstuur</button>
+            <ul id="message-list"></ul>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Mijn Vernieuwde Website</p>
+    </footer>
+</body>
 </html>
