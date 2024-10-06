@@ -28,6 +28,7 @@
         const analytics = getAnalytics(app);
 
         document.addEventListener('DOMContentLoaded', () => {
+            console.log("Document geladen. Laden van berichten...");
             loadMessages();
         });
 
@@ -35,19 +36,23 @@
         let board = ['', '', '', '', '', '', '', '', ''];
 
         function handleCellClick(cell, index) {
+            console.log("Cel aangeklikt: Index", index);
             if (cell.innerText === '' && !checkWinner()) {
                 cell.innerText = currentPlayer;
                 cell.classList.add(currentPlayer.toLowerCase());
                 board[index] = currentPlayer;
+                console.log("Speler", currentPlayer, "heeft een zet gedaan.");
                 if (checkWinner()) {
                     setTimeout(() => alert(currentPlayer + ' heeft gewonnen!'), 100);
                 } else {
                     currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                    console.log("Volgende speler is", currentPlayer);
                 }
             }
         }
 
         function resetGame() {
+            console.log("Spel resetten...");
             const cells = document.querySelectorAll('.cell');
             cells.forEach(cell => {
                 cell.innerText = '';
@@ -66,13 +71,14 @@
             for (let combination of winningCombinations) {
                 const [a, b, c] = combination;
                 if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    console.log("Winnaar gevonden: Speler", board[a]);
                     return true;
                 }
             }
             return false;
         }
 
-        function addMessage() {
+        async function addMessage() {
             const messageInput = document.getElementById('message-input');
             const date = new Date();
             const dateTimeString = date.toLocaleString();
@@ -82,24 +88,36 @@
                     text: messageInput.value,
                     timestamp: dateTimeString
                 };
-                // Bericht naar Firebase opslaan
-                const messagesRef = ref(database, 'messages');
-                push(messagesRef, newMessage);
-                messageInput.value = '';
+                console.log("Proberen bericht toe te voegen:", newMessage);
+                try {
+                    // Bericht naar Firebase opslaan
+                    const messagesRef = ref(database, 'messages');
+                    await push(messagesRef, newMessage);
+                    console.log("Bericht succesvol toegevoegd");
+                    messageInput.value = '';
+                } catch (error) {
+                    console.error('Fout bij het opslaan van bericht:', error);
+                }
+            } else {
+                console.log("Berichtveld is leeg");
             }
         }
 
         function loadMessages() {
             const messageList = document.getElementById('message-list');
             const messagesRef = ref(database, 'messages');
+            console.log("Laden van berichten uit de database...");
             onValue(messagesRef, (snapshot) => {
                 messageList.innerHTML = '';
                 snapshot.forEach((childSnapshot) => {
                     const message = childSnapshot.val();
+                    console.log("Ontvangen bericht:", message);
                     const listItem = document.createElement('li');
                     listItem.innerText = `${message.timestamp} - ${message.text}`;
                     messageList.appendChild(listItem);
                 });
+            }, (error) => {
+                console.error("Fout bij laden van berichten:", error);
             });
         }
     </script>
@@ -194,23 +212,4 @@
             <div class="cell" onclick="handleCellClick(this, 2)"></div>
             <div class="cell" onclick="handleCellClick(this, 3)"></div>
             <div class="cell" onclick="handleCellClick(this, 4)"></div>
-            <div class="cell" onclick="handleCellClick(this, 5)"></div>
-            <div class="cell" onclick="handleCellClick(this, 6)"></div>
-            <div class="cell" onclick="handleCellClick(this, 7)"></div>
-            <div class="cell" onclick="handleCellClick(this, 8)"></div>
-        </div>
-        <button id="reset-button" onclick="resetGame()">Reset Spel</button>
-        <a href="https://www.rolbox.com" target="_blank">Bezoek Rolbox</a>
-        
-        <div id="message-board">
-            <h2>Laat een bericht achter:</h2>
-            <input type="text" id="message-input" placeholder="Typ hier je bericht...">
-            <button onclick="addMessage()">Verstuur</button>
-            <ul id="message-list"></ul>
-        </div>
-    </main>
-    <footer>
-        <p>&copy; 2024 Mijn Vernieuwde Website</p>
-    </footer>
-</body>
-</html>
+            <div class="cell" onclick="handleCellClick(this, 5)
