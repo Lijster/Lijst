@@ -105,6 +105,10 @@
 
         function loadMessages() {
             const messageList = document.getElementById('message-list');
+            if (!messageList) {
+                console.error("Element met ID 'message-list' niet gevonden in de HTML.");
+                return;
+            }
             const messagesRef = ref(database, 'messages');
             console.log("Laden van berichten uit de database...");
             onValue(messagesRef, (snapshot) => {
@@ -215,4 +219,25 @@
             <div class="cell" onclick="handleCellClick(this, 0)"></div>
             <div class="cell" onclick="handleCellClick(this, 1)"></div>
             <div class="cell" onclick="handleCellClick(this, 2)"></div>
-            <div class="cell" onclick="handleCell
+            <div class="cell" onclick="handleCellClick(this, 3)"></div>
+            <div class="cell" onclick="handleCellClick(this, 4)"></div>
+            <div class="cell" onclick="handleCellClick(this, 5)"></div>
+            <div class="cell" onclick="handleCellClick(this, 6)"></div>
+            <div class="cell" onclick="handleCellClick(this, 7)"></div>
+            <div class="cell" onclick="handleCellClick(this, 8)"></div>
+        </div>
+        <button id="reset-button" onclick="resetGame()">Reset Spel</button>
+        <a href="https://www.rolbox.com" target="_blank">Bezoek Rolbox</a>
+        
+        <div id="message-board">
+            <h2>Laat een bericht achter:</h2>
+            <input type="text" id="message-input" placeholder="Typ hier je bericht...">
+            <button onclick="addMessage()">Verstuur</button>
+            <ul id="message-list"></ul>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Mijn Vernieuwde Website</p>
+    </footer>
+</body>
+</html>
