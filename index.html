@@ -120,6 +120,11 @@
                 console.error("Fout bij laden van berichten:", error);
             });
         }
+
+        // Functies beschikbaar maken in de globale scope
+        window.addMessage = addMessage;
+        window.handleCellClick = handleCellClick;
+        window.resetGame = resetGame;
     </script>
     <style>
         body {
@@ -210,6 +215,4 @@
             <div class="cell" onclick="handleCellClick(this, 0)"></div>
             <div class="cell" onclick="handleCellClick(this, 1)"></div>
             <div class="cell" onclick="handleCellClick(this, 2)"></div>
-            <div class="cell" onclick="handleCellClick(this, 3)"></div>
-            <div class="cell" onclick="handleCellClick(this, 4)"></div>
-            <div class="cell" onclick="handleCellClick(this, 5)
+            <div class="cell" onclick="handleCell
