@@ -150,6 +150,11 @@
             padding: 1em;
             width: 100%;
         }
+        img {
+            max-width: 400px;
+            height: auto;
+            margin-top: 1em;
+        }
         .tic-tac-toe {
             display: grid;
             grid-template-columns: repeat(3, 100px);
@@ -205,10 +210,11 @@
 </head>
 <body>
     <header>
-        <h1>Welkom bij dit NICE spel</h1>
+        <h1>Welkom op Lijst zijn website</h1>
     </header>
     <main>
         <p>Dit is een vernieuwde versie van mijn website met aangepaste kleuren en lay-out. Je kunt deze tekst aanpassen om meer over jezelf te vertellen of extra informatie toe te voegen.</p>
+        <img src="mijnfoto.jpg" alt="Foto van mij">
         <div class="tic-tac-toe">
             <div class="cell" onclick="handleCellClick(this, 0)"></div>
             <div class="cell" onclick="handleCellClick(this, 1)"></div>
@@ -221,6 +227,7 @@
             <div class="cell" onclick="handleCellClick(this, 8)"></div>
         </div>
         <button id="reset-button" onclick="resetGame()">Reset Spel</button>
+        <a href="https://www.rolbox.com" target="_blank">Bezoek Rolbox</a>
         
         <div id="message-board">
             <h2>Laat een bericht achter:</h2>
